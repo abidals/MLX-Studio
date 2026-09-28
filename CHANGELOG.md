@@ -32,6 +32,12 @@ web UI, and the DMG build stamps it into the app bundle.
   depends on landed one day after 0.20.0. The Krea 2 backend installs with `--no-deps`, because
   its v0.3.1 pins (`mflux<0.19`, `mlx<0.32`) would otherwise clash with the new pin (v0.3.1 was
   verified to run fine on mflux 0.20 / mlx 0.32). See `requirements.txt`.
+- **The DMG build ships the same pinned layout.** `packaging/build_dmg.sh` now installs mflux from
+  the pin plus pywebview/mlx-lm, adds the Krea 2 backend with `--no-deps`, and self-checks the
+  bundle (import assertions for the 2.1 LoRA loader, krea2, pywebview and mlx-lm) before signing —
+  so the standalone app launches with all ten backends. The bundle grows to ~1.2 GB on disk
+  (~470 MB compressed): mflux 0.20 pulls torch/matplotlib/opencv as support deps (Mac compute
+  stays MLX).
 
 ## [0.9.1]
 ## [0.9.1] — 2026-07-14

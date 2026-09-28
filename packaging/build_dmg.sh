@@ -50,11 +50,35 @@ BPY="$RES/python/bin/python3"
 find "$RES/python/lib" -name 'EXTERNALLY-MANAGED' -delete 2>/dev/null || true
 
 # --- 2) install runtime deps INTO the bundled interpreter -----------------------------------
-echo "  • installing runtime deps into the bundle (mlx, mflux, transformers, pywebview, Krea 2 Turbo backend)…"
+# Same layout as requirements.txt: mflux pinned to the main-HEAD commit that carries
+# Qwen-Image-2.1 LoRA support (the Viggle Turbo backend; PRs #756/#768, after 0.20.0), then the
+# Krea 2 backend WITHOUT its own dependency pins (they cap mflux<0.19 / mlx<0.32 and would
+# downgrade the pin away — v0.3.1 is verified to run fine on mflux 0.20 / mlx 0.32), plus the
+# desktop window and the optional prompt-enhancer. UV visits the Krea 2 package with --no-deps
+# by splitting the install into a second invocation that lists krea2's remaining light deps.
+echo "  • installing runtime deps into the bundle (mlx, mflux@HEAD, transformers, pywebview, mlx-lm)…"
 uv pip install --python "$BPY" \
-  "krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1" \
+  "mflux @ git+https://github.com/mflux-community/mflux.git@0db686992d65cbd84bd925dfce23b77ad0bedf7d" \
   "pywebview>=5,<7" \
-  "mlx-lm>=0.20"
+  "mlx-lm>=0.20" \
+  "requests>=2.28,<3" \
+  "numpy>=1.24,<3" \
+  "pillow>=10,<13"
+echo "  • installing the Krea 2 Turbo backend (no-deps) into the bundle…"
+uv pip install --python "$BPY" --no-deps \
+  "krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1"
+"$BPY" - <<'CHECK'
+import importlib.util
+missing = []
+for mod in ("mflux.models.qwen21.weights.qwen21_lora_mapping",   # Viggle Turbo: 2.1 LoRA loader
+            "krea2.pipeline",                                   # Krea 2 backend
+            "webview",                                          # native desktop window
+            "mlx_lm"):                                          # prompt enhancer extra
+    if importlib.util.find_spec(mod) is None:
+        missing.append(mod)
+assert not missing, f"bundle is missing runtime deps: {missing}"
+print("bundle deps check: OK (mflux 2.1 LoRA + krea2 + pywebview + mlx-lm all importable)")
+CHECK
 
 # --- 3) the app code (pure-python studio/ + web/), beside the bundled interpreter ------------
 cp -R "$ROOT/studio" "$RES/app/studio"
