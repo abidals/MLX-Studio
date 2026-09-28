@@ -1,8 +1,20 @@
 # Alis Studio runs on the Python standard library alone. Backends bring their own deps:
 #
-# Krea 2 Turbo backend — the pure-MLX port (pulls mlx, mflux, transformers, …):
-# pinned to v0.3.0 — the release that added runtime LoRA (set_loras), which the Krea 2 backend uses.
-krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1
-
-# Optional — run as a native desktop window (`python3 desktop.py`); also: pip install "alis-studio[desktop]"
-# pywebview>=5,<7
+# mflux powers the Z-Image / FLUX / Qwen-Image / Viggle Turbo backends — pinned to a main-HEAD
+# commit until an mflux release ships Qwen-Image-2.1 LoRA support (the runtime-LoRA path the
+# Viggle Turbo backend needs; landed as PRs #756 + #768, after the 0.20.0 release):
+mflux @ git+https://github.com/mflux-community/mflux.git@0db686992d65cbd84bd925dfce23b77ad0bedf7d
+# …and the (few) deps the Krea 2 backend needs on top:
+transformers>=5.0,<6       # Qwen text-encoder/tokenizers (krea2 + mflux)
+huggingface-hub>=1.1.6,<2
+requests>=2.28,<3
+numpy>=1.24,<3
+pillow>=10,<13
+# mlx >=0.32 comes with mflux.
+#
+# The Krea 2 Turbo backend (krea2-alis-mlx) is installed with --no-deps because its own
+# dependency pins (mflux<0.19, mlx<0.32) predate the pin above and would otherwise downgrade
+# mflux away (v0.3.1 runs fine on mflux 0.20 / mlx 0.32 — verified). After
+# `pip install -r requirements.txt`, add it with:
+#   python3 -m pip install --no-deps krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1
+# (skipping this leaves every other model working — the studio skips backends whose deps are missing).

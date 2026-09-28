@@ -8,6 +8,32 @@ The version lives in exactly one place — `studio/__version__` (in `studio/__in
 `pyproject.toml` reads it via `[tool.setuptools.dynamic]`, the server injects it into the
 web UI, and the DMG build stamps it into the app bundle.
 
+## [Unreleased]
+
+### Added
+- **Viggle Turbo (Qwen-Image-2.1)** — Viggle's DMD2-distilled 6-step student of Qwen-Image-2.1
+  (`Viggle/Qwen-Image-2.1-viggle-turbo` v0.2.1), shipped as a rank-256 LoRA that is applied at
+  runtime — **never merged** into the (4/8-bit quantized) transformer, exactly as diffusers does —
+  and samples with the model's distilled sigma schedule: **6 steps, no CFG** (8 steps for dense
+  small text). Text-to-image and strength-based img2img ship now; multi-reference instruction
+  editing follows when mflux's 2.1 edit variant learns LoRA mappings. Build options: **8-bit**
+  and **4-bit** (the 17.5 GB Qwen3-VL text encoder is never quantized, so both peak ~47 GB at
+  1024² — comfortable on 64 GB; measured). The ~33 GB base weights auto-download via mflux on
+  first Generate; the 1.3 GB adapter is downloadable and deletable in the model manager.
+  **License note:** both the adapter and the base model are under the Qwen RESEARCH LICENSE —
+  **non-commercial use only**.
+- **Live preview for the new backend** — the in-progress-latent decoder in `mflux_common` now
+  understands `QwenImage21` (unpack via `Qwen21LatentCreator`), so the eye toggle streams frames
+  for it like the other mflux models.
+
+### Changed
+- **mflux is pinned to a main-HEAD commit** (PRs #756 + #768) until a release ships Qwen-Image-2.1
+  LoRA support — the runtime-LoRA path and the common adapter key formats the Viggle backend
+  depends on landed one day after 0.20.0. The Krea 2 backend installs with `--no-deps`, because
+  its v0.3.1 pins (`mflux<0.19`, `mlx<0.32`) would otherwise clash with the new pin (v0.3.1 was
+  verified to run fine on mflux 0.20 / mlx 0.32). See `requirements.txt`.
+
+## [0.9.1]
 ## [0.9.1] — 2026-07-14
 
 ### Added

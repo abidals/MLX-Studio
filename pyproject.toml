@@ -18,11 +18,18 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Multimedia :: Graphics",
 ]
-# The app itself is pure standard library. The default Krea 2 Turbo backend is pulled from GitHub;
-# mflux powers the Z-Image / FLUX / Qwen-Image backends (>=0.18 ships the Z-Image MLX model).
+# The app itself is pure standard library. Backend deps live in requirements.txt (single source
+# of truth): the mflux pin is one commit ahead of the 0.20.0 release — it has to be, until an
+# mflux release ships Qwen-Image-2.1 LoRA support (Viggle Turbo backend; see requirements.txt).
+# krea2-alis-mlx is installed with `pip install --no-deps` afterwards (its own pins would
+# downgrade mflux; see requirements.txt for the one-liner).
 dependencies = [
-    "krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1",  # v0.3.1 = LoRA + gated-repo auth (HF token)
-    "mflux>=0.18,<0.19",
+    "mflux @ git+https://github.com/mflux-community/mflux.git@0db686992d65cbd84bd925dfce23b77ad0bedf7d",
+    "transformers>=5.0,<6",
+    "huggingface-hub>=1.1.6,<2",
+    "requests>=2.28,<3",
+    "numpy>=1.24,<3",
+    "pillow>=10,<13",
 ]
 
 [project.optional-dependencies]

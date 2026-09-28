@@ -11,12 +11,13 @@ from .backends.ernie import ErnieImageTurboBackend
 from .backends.flux2 import Flux2KleinBackend
 from .backends.krea2 import Krea2Backend
 from .backends.mflux_models import FluxDevBackend, FluxSchnellBackend, QwenImageBackend
+from .backends.qwen21_viggle import ViggleQwen21TurboBackend
 from .backends.qwen_edit import QwenImageEditBackend
 from .backends.z_image import ZImageTurboBackend
 
 # register additional models here — a backend whose deps aren't importable is skipped automatically
 BACKENDS = [Krea2Backend, ZImageTurboBackend, CyberRealisticZBackend, Flux2KleinBackend, QwenImageBackend,
-            ErnieImageTurboBackend, QwenImageEditBackend, FluxSchnellBackend, FluxDevBackend]
+            ErnieImageTurboBackend, QwenImageEditBackend, ViggleQwen21TurboBackend, FluxSchnellBackend, FluxDevBackend]
 
 
 class Registry:

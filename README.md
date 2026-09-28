@@ -7,7 +7,8 @@ No cloud, no accounts, your images never leave your machine.
 
 Ships with **[Krea 2 Turbo](https://github.com/avlp12/krea2_alis_mlx)** (pure-MLX) and
 **[Z-Image Turbo](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo)** (Apache-2.0 — a fast 6B model
-that **runs on a 16 GB Mac**), plus **Qwen-Image** and **FLUX.1** (schnell / dev) via
+that **runs on a 16 GB Mac**), plus **Qwen-Image**, **Viggle Turbo (Qwen-Image-2.1, 6-step)** and
+**FLUX.1** (schnell / dev) via
 [mflux](https://github.com/filipstrand/mflux). On launch it **detects your Mac's memory and
 recommends the model that fits best**. More models plug in as small backends — see
 [Adding a model](#adding-a-model).
@@ -30,6 +31,8 @@ on launch. On macOS use `python3`.
 git clone https://github.com/avlp12/alis-studio.git
 cd alis-studio
 python3 -m pip install -r requirements.txt
+# the Krea 2 backend is installed without its own pins (they'd downgrade mflux; see requirements.txt):
+python3 -m pip install --no-deps krea2-alis-mlx @ git+https://github.com/avlp12/krea2_alis_mlx.git@v0.3.1
 python3 app.py            # opens http://localhost:7860 in your browser
 ```
 
@@ -144,6 +147,7 @@ automatically (two pipelines won't fit); bigger Macs keep it cached for instant 
 | **Qwen-Image** | 8-bit, bf16. Apache-2.0, open. (No 4-bit — its ~20B transformer gets grainy below 8-bit.) | auto on first use via mflux (~40 GB) |
 | **ERNIE-Image Turbo** | 8-bit (≥ 48 GB) · bf16 (≥ 64 GB). Baidu's 8B, Apache-2.0. **Best here for text rendering / posters / structured layouts**; ~8-step Turbo. (No 4-bit — loads full precision before quantizing, so 4-bit wouldn't lower the load floor.) | auto on first use via mflux (~32 GB) |
 | **Qwen-Image Edit** | 8-bit (needs ≥ 64 GB) · bf16 (≥ 96 GB). Apache-2.0 instruction editing. (No 4-bit — mflux quantizes it to noise.) | auto on first use via mflux (~54 GB) |
+| **Viggle Turbo (Qwen-Image-2.1)** | 8-bit · 4-bit. Viggle's DMD2-distilled 6-step student of Qwen-Image-2.1 — T2I + img2img in **6 steps, no CFG** (8 steps for dense text); a rank-256 LoRA applied at runtime, never merged. Measured ~47 GB peak at 1024² (the 17.5 GB Qwen3-VL text encoder is never quantized) — comfortable on **64 GB**. Instruction editing with reference images: follow-up. **Qwen Research License — non-commercial.** | adapter (1.3 GB) managed in-app · base (~33 GB) auto on first use via mflux |
 | **FLUX.2 klein 4B** | 4-bit (**runs on 16 GB**) · 8-bit · bf16. BFL's 2026 fast model, ~4 steps, Apache-2.0, **ungated**. img2img + LoRA. | auto on first use via mflux (~15 GB) |
 | **FLUX.1 schnell** | 8/4-bit, bf16. Apache-2.0 weights, **gated repo**. | auto on first use via mflux (~24 GB) |
 | **FLUX.1 dev** | 8/4-bit, bf16. Non-commercial, **gated**. | auto on first use via mflux (~24 GB) |
@@ -233,12 +237,14 @@ to every backend's output, reusing Krea 2's pure-MLX classifier.
 
 Everything runs **locally** — prompts and images never leave your Mac.
 
-This application is **MIT** licensed ([`LICENSE`](LICENSE)). **Each model carries its own license:**
-the Krea 2 Turbo backend uses weights under the
+This application is **MIT** licensed ([`LICENSE`](LICENSE)). **Each model carries its own model/adapter
+license:** the Krea 2 Turbo backend uses weights under the
 [Krea 2 Community License](https://krea.ai/krea-2-licensing) (commercial use requires annual revenue
-under $1M; content filtering required for deployments — the built-in filter is on by default), and
+under $1M; content filtering required for deployments — the built-in filter is on by default),
 **CyberRealistic Z** is **CreativeML OpenRAIL-M** — use-based restrictions apply; see the
-[model card](https://huggingface.co/avlp12/CyberRealistic-Z-Image-Turbo-v4-mflux-4bit). You're
-responsible for complying with the license of any model you load.
+[model card](https://huggingface.co/avlp12/CyberRealistic-Z-Image-Turbo-v4-mflux-4bit) — and
+**Viggle Turbo (Qwen-Image-2.1)** (adapter + base) is under the **Qwen RESEARCH LICENSE**:
+non-commercial use only (research/evaluation); commercial use requires a separate licence from the
+licensor. You're responsible for complying with the license of any model you load.
 
 *Part of the **Alis** MLX line — see also [krea2_alis_mlx](https://github.com/avlp12/krea2_alis_mlx).*

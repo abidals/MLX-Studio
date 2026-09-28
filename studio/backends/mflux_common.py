@@ -98,6 +98,10 @@ def _decode_preview_latents(model, latents, config):
                 from mflux.models.qwen.latent_creator.qwen_latent_creator import QwenLatentCreator
                 lat = QwenLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
                 decoded = VAEUtil.decode(vae=model.vae, latent=lat, tiling_config=tiling)
+            elif cls == "QwenImage21":
+                from mflux.models.qwen21.latent_creator.qwen21_latent_creator import Qwen21LatentCreator
+                lat = Qwen21LatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
+                decoded = VAEUtil.decode(vae=model.vae, latent=lat, tiling_config=tiling)
             elif cls == "Flux1":
                 from mflux.models.flux.latent_creator.flux_latent_creator import FluxLatentCreator
                 lat = FluxLatentCreator.unpack_latents(latents=latents, height=config.height, width=config.width)
